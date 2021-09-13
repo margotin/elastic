@@ -1,60 +1,13 @@
-Symfony Demo Application
-========================
+Test elasticSearch with Symfony demo
+====================================
 
-The "Symfony Demo Application" is a reference application created to show how
-to develop applications following the [Symfony Best Practices][1].
+I followed the article [Intégrer Elasticsearch 6 dans votre application Symfony 4][1] and adapted it for a version 7 of elasticSearch and a version 5 of symfony
 
-Requirements
-------------
 
-  * PHP 7.3 or higher;
-  * PDO-SQLite PHP extension enabled;
-  * and the [usual Symfony application requirements][2].
+Installing elasticSearch and Kibana via docker-compose
+------------------------------------------------------
 
-Installation
-------------
+I used the article [deploying Elasticsearch and Kibana with Docker][2] to perform the installation
 
-[Download Symfony][4] to install the `symfony` binary on your computer and run
-this command:
-
-```bash
-$ symfony new --demo my_project
-```
-
-Alternatively, you can use Composer:
-
-```bash
-$ composer create-project symfony/symfony-demo my_project
-```
-
-Usage
------
-
-There's no need to configure anything to run the application. If you have
-[installed Symfony][4] binary, run this command:
-
-```bash
-$ cd my_project/
-$ symfony serve
-```
-
-Then access the application in your browser at the given URL (<https://localhost:8000> by default).
-
-If you don't have the Symfony binary installed, run `php -S localhost:8000 -t public/`
-to use the built-in PHP web server or [configure a web server][3] like Nginx or
-Apache to run the application.
-
-Tests
------
-
-Execute this command to run tests:
-
-```bash
-$ cd my_project/
-$ ./bin/phpunit
-```
-
-[1]: https://symfony.com/doc/current/best_practices.html
-[2]: https://symfony.com/doc/current/reference/requirements.html
-[3]: https://symfony.com/doc/current/cookbook/configuration/web_server_configuration.html
-[4]: https://symfony.com/download
+[1]: https://afsy.fr/avent/2017/20-elasticsearch-6-et-symfony-4
+[2]: https://quoeamaster.medium.com/deploying-elasticsearch-and-kibana-with-docker-86a4ac78d851
