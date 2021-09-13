@@ -17,6 +17,10 @@ use App\Event\CommentCreatedEvent;
 use App\Form\CommentType;
 use App\Repository\PostRepository;
 use App\Repository\TagRepository;
+use Elastica\Client;
+use Elastica\Query;
+use Elastica\Query\BoolQuery;
+use Elastica\Query\MultiMatch;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -143,7 +147,7 @@ class BlogController extends AbstractController
     /**
      * @Route("/search", methods="GET", name="blog_search")
      */
-    public function search(Request $request, PostRepository $posts): Response
+    public function search(Request $request, /*PostRepository $posts,*/ Client $client): Response
     {
         $query = $request->query->get('q', '');
         $limit = $request->query->get('l', 10);
@@ -152,17 +156,33 @@ class BlogController extends AbstractController
             return $this->render('blog/search.html.twig', ['query' => $query]);
         }
 
-        $foundPosts = $posts->findBySearchQuery($query, $limit);
+//        $foundPosts = $posts->findBySearchQuery($query, $limit);
+//
+//        $results = [];
+//        foreach ($foundPosts as $post) {
+//            $results[] = [
+//                'title' => htmlspecialchars($post->getTitle(), \ENT_COMPAT | \ENT_HTML5),
+//                'date' => $post->getPublishedAt()->format('M d, Y'),
+//                'author' => htmlspecialchars($post->getAuthor()->getFullName(), \ENT_COMPAT | \ENT_HTML5),
+//                'summary' => htmlspecialchars($post->getSummary(), \ENT_COMPAT | \ENT_HTML5),
+//                'url' => $this->generateUrl('blog_post', ['slug' => $post->getSlug()]),
+//            ];
+//        }
 
+        $match = new MultiMatch();
+        $match->setQuery($query);
+        $match->setFields(["title^4", "summary", "content", "author"]);
+
+        $bool = new BoolQuery();
+        $bool->addMust($match);
+
+        $elasticaQuery = new Query($bool);
+        $elasticaQuery->setSize($limit);
+
+        $foundPosts = $client->getIndex('blog')->search($elasticaQuery);
         $results = [];
         foreach ($foundPosts as $post) {
-            $results[] = [
-                'title' => htmlspecialchars($post->getTitle(), \ENT_COMPAT | \ENT_HTML5),
-                'date' => $post->getPublishedAt()->format('M d, Y'),
-                'author' => htmlspecialchars($post->getAuthor()->getFullName(), \ENT_COMPAT | \ENT_HTML5),
-                'summary' => htmlspecialchars($post->getSummary(), \ENT_COMPAT | \ENT_HTML5),
-                'url' => $this->generateUrl('blog_post', ['slug' => $post->getSlug()]),
-            ];
+            $results[] = $post->getSource();
         }
 
         return $this->json($results);

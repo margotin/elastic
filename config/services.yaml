@@ -34,6 +34,12 @@ services:
     App\EventSubscriber\CommentNotificationSubscriber:
         $sender: '%app.notifications.email_sender%'
 
+    Elastica\Client:
+        $config:
+            - host: 'elasticsearch'
+            - port: 9200
+            - transport: 'http'
+
 when@test:
     services:
         test.user_password_hasher:
